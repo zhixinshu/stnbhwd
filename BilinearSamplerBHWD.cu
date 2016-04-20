@@ -111,7 +111,7 @@ static int cunn_BilinearSamplerBHWD_updateOutput(lua_State *L)
   THCState *state = getCutorchState(L);
   THCudaTensor *inputImages = (THCudaTensor *)luaT_checkudata(L, 2, "torch.CudaTensor");
   THCudaTensor *grids = (THCudaTensor *)luaT_checkudata(L, 3, "torch.CudaTensor");
-  THCudaTensor *output = (THCudaTensor *)luaT_getfieldcheckudata(L, 1, "output", "torch.CudaTensor");
+  THCudaTensor *output = (THCudaTensor *)luaT_checkudata(L, 4, "torch.CudaTensor");
 
 
    dim3 blocks((output->size[2]+15)/16, output->size[1], output->size[0]);

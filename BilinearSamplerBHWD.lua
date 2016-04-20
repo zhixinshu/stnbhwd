@@ -51,8 +51,8 @@ local function addOuterDim(t)
 end
 
 function BilinearSamplerBHWD:updateOutput(input)
-	local _inputImages = input[1]
-	local _grids = input[2]
+   local _inputImages = input[1]
+   local _grids = input[2]
 
    local inputImages, grids
    if _inputImages:nDimension()==3 then
@@ -67,9 +67,9 @@ function BilinearSamplerBHWD:updateOutput(input)
 
    self:check(input)
 
-   self.output:resize(inputImages:size(1), grids:size(2), grids:size(3), inputImages:size(4))	
+   self.output:resize(inputImages:size(1), grids:size(2), grids:size(3), inputImages:size(4))
 
-	inputImages.nn.BilinearSamplerBHWD_updateOutput(self, inputImages, grids)
+   inputImages.nn.BilinearSamplerBHWD_updateOutput(self, inputImages, grids, self.output)
 
    if _inputImages:nDimension()==3 then
       self.output=self.output:select(1,1)

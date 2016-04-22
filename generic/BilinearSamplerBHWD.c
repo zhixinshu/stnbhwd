@@ -9,7 +9,7 @@ static int nn_(BilinearSamplerBHWD_updateOutput)(lua_State *L)
 {
   THTensor *inputImages = luaT_checkudata(L, 2, torch_Tensor);
   THTensor *grids = luaT_checkudata(L, 3, torch_Tensor);
-  THTensor *output = luaT_getfieldcheckudata(L, 1, "output", torch_Tensor);
+  THTensor *output = luaT_checkudata(L, 4, torch_Tensor);
 
   int batchsize = inputImages->size[0];
   int inputImages_height = inputImages->size[1];

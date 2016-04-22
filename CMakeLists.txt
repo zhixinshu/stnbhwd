@@ -49,37 +49,25 @@ ADD_TORCH_PACKAGE(stn "${src}" "${luasrc}")
 TARGET_LINK_LIBRARIES(stn luaT TH)
 
 
-FIND_PACKAGE(CUDA 4.0 REQUIRED)
+FIND_PACKAGE(CUDA 5.5)
 
-LIST(APPEND CUDA_NVCC_FLAGS "-arch=sm_20")
+IF (CUDA_FOUND)
+  LIST(APPEND CUDA_NVCC_FLAGS "-arch=sm_20")
 
-INCLUDE_DIRECTORIES("${Torch_INSTALL_INCLUDE}/THC")
-SET(src-cuda init.cu)
-CUDA_ADD_LIBRARY(custn MODULE ${src-cuda})
-TARGET_LINK_LIBRARIES(custn luaT THC TH)
-IF(APPLE)
+  INCLUDE_DIRECTORIES("${Torch_INSTALL_INCLUDE}/THC")
+  SET(src-cuda init.cu)
+  CUDA_ADD_LIBRARY(custn MODULE ${src-cuda})
+  TARGET_LINK_LIBRARIES(custn luaT THC TH)
+  IF(APPLE)
+    SET_TARGET_PROPERTIES(custn PROPERTIES
+      LINK_FLAGS "-undefined dynamic_lookup")
+  ENDIF()
+  ### Torch packages supposes libraries prefix is "lib"
   SET_TARGET_PROPERTIES(custn PROPERTIES
-    LINK_FLAGS "-undefined dynamic_lookup")
-ENDIF()
+    PREFIX "lib"
+    IMPORT_PREFIX "lib")
 
-
-### Torch packages supposes libraries prefix is "lib"
-SET_TARGET_PROPERTIES(custn PROPERTIES
-  PREFIX "lib"
-  IMPORT_PREFIX "lib")
-
-INSTALL(TARGETS custn
-  RUNTIME DESTINATION "${Torch_INSTALL_LUA_CPATH_SUBDIR}"
-  LIBRARY DESTINATION "${Torch_INSTALL_LUA_CPATH_SUBDIR}")
-
-INSTALL(
-  FILES
-  ${luasrc}
-  DESTINATION "${Torch_INSTALL_LUA_PATH_SUBDIR}/custn")
-
-
-
-
-
-
-
+  INSTALL(TARGETS custn
+    RUNTIME DESTINATION "${Torch_INSTALL_LUA_CPATH_SUBDIR}"
+    LIBRARY DESTINATION "${Torch_INSTALL_LUA_CPATH_SUBDIR}")
+ENDIF(CUDA_FOUND)

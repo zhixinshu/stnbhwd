@@ -1,12 +1,15 @@
 require 'nn'
-require 'cutorch'
+local withCuda = pcall(require, 'cutorch')
+
 require 'libstn'
-require 'libcustn'
+if withCuda then
+   require 'libcustn'
+end
 
-include('AffineTransformMatrixGenerator.lua')
-include('AffineGridGeneratorBHWD.lua')
-include('BilinearSamplerBHWD.lua')
+require('stn.AffineTransformMatrixGenerator')
+require('stn.AffineGridGeneratorBHWD')
+require('stn.BilinearSamplerBHWD')
 
-include('test.lua')
+require('stn.test')
 
 return nn

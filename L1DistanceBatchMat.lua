@@ -1,4 +1,4 @@
-require 'nn'
+require 'cunn'
 
 local L1DistanceBatch, parent = torch.class('nn.L1DistanceBatchMat', 'nn.Module')
 
@@ -13,6 +13,14 @@ function L1DistanceBatch:__init()
 end
 
 function L1DistanceBatch:updateOutput(input)
+   if input:type()=='torch.CudaTensor' then
+      return self:updateOutputGpu(input)
+   else
+      return self:updateOutputCpu(input)
+   end
+end
+
+function L1DistanceBatch:updateOutputCpu(input)
    assert(input:nDimension()==3)
    local bs = input:size(1)
    local b = input:size(2)
@@ -33,7 +41,7 @@ function L1DistanceBatch:updateOutput(input)
    end   
 
    for i=1,bs do
-      self.outputF[i][i]:fill(1e6)
+--      self.outputF[i][i]:fill(1e6)
    end   
    
    self.output:resize(self.outputF:size()):copy(self.outputF)
@@ -41,7 +49,28 @@ function L1DistanceBatch:updateOutput(input)
    return self.output
 end
 
+function L1DistanceBatch:updateOutputGpu(input)
+   assert(input:nDimension()==3)
+   local bs = input:size(1)
+   local b = input:size(2)
+   local c = input:size(3)
+   
+   self.output:resize(bs,bs,b):zero()
+   
+   self.output.nn.L1DistanceBatchMat_updateOutput(nil, input, self.output)
+   
+   return self.output
+end
+
 function L1DistanceBatch:updateGradInput(input, gradOutput)
+   if input:type()=='torch.CudaTensor' then
+      return self:updateGradInputGpu(input, gradOutput)
+   else
+      return self:updateGradInputCpu(input, gradOutput)
+   end
+end
+
+function L1DistanceBatch:updateGradInputCpu(input, gradOutput)
    assert(input:nDimension()==3)
    local bs = input:size(1)
    local b = input:size(2)
@@ -78,14 +107,21 @@ function L1DistanceBatch:updateGradInput(input, gradOutput)
    return self.gradInput
 end
 
+function L1DistanceBatch:updateGradInputGpu(input, gradOutput)
+   assert(input:nDimension()==3)
+   local bs = input:size(1)
+   local b = input:size(2)
+   local c = input:size(3)
+   
+   self.gradInput:resizeAs(input):zero()
+   
+   self.output.nn.L1DistanceBatchMat_updateGradInput(nil, input, gradOutput, self.gradInput)
+   
+   return self.gradInput
+end
+
 function L1DistanceBatch:type(...)
    parent.type(self, ...)
-   self.inputF = torch.FloatTensor()
-   self.outputF = torch.FloatTensor()
-   self.gradInputF = torch.FloatTensor()
-   self.gradOutputF = torch.FloatTensor()
-   self.buffer1 = torch.FloatTensor()
-   self.buffer2 = torch.FloatTensor()
    return self
 end
 

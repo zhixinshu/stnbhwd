@@ -1,6 +1,3 @@
-require 'cunn'
-if not nn.L1DistanceBatchMat then paths.dofile('L1DistanceBatchMat.lua') end
-
 local BatchDiscrimination, parent = torch.class('nn.BatchDiscrimination', 'nn.Sequential')
 
 function BatchDiscrimination:__init(nInputPlane, B, C)
@@ -34,7 +31,7 @@ function BatchDiscrimination:accGradParameters()
    return
 end
 
-if false then
+if true then
    bs = 5
    nInputPlane = 4
    nkernels = 8
@@ -54,7 +51,7 @@ if false then
    
 end
 
-if false then
+if true then
    bs = 64
    nInputPlane = 1024
    nkernels = 50

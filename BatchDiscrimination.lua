@@ -31,7 +31,7 @@ function BatchDiscrimination:accGradParameters()
    return
 end
 
-if true then
+if false then
    bs = 5
    nInputPlane = 4
    nkernels = 8
@@ -51,7 +51,7 @@ if true then
    
 end
 
-if true then
+if false then
    bs = 64
    nInputPlane = 1024
    nkernels = 50

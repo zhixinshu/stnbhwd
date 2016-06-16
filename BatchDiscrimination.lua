@@ -1,5 +1,24 @@
 local BatchDiscrimination, parent = torch.class('nn.BatchDiscrimination', 'nn.Sequential')
 
+--[[
+   Batch discrimination layer, as in "Improved Techniques for Training GANs".
+   
+   B is ~ "number of kernels"
+   C is ~ "kernel dimensions"
+   
+   Input has to be (batchSize, nInputPlane)
+   Then the layer does a matrix multiply (nn.Linear, zero bias) with a nInputPlane*(B*C) matrix -> obtain (batchSize, B*C)
+   Then reshape to (batchSize, B, C)
+   Then compute L1 distance between rows (collapsing C) -> obtain (batchSize, batchSize, B)
+
+   (**there, authors put 1e6 on the diagonal to obtain 0 on the diagonal after the exp step, I don't**)
+
+   Then x-> exp(-x)
+   Then sum over second dimension -> obtain (batchSize, B)
+   Then concatenate with input -> obtain (batchSize, nInputPlane + B)
+
+--]]
+
 function BatchDiscrimination:__init(nInputPlane, B, C)
    parent.__init(self)
 

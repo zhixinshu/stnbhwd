@@ -57,6 +57,8 @@ for epoch=1,30 do
       local pred = model:forward(inputs:cuda())
       valError = valError + criterion:forward(pred, labels:cuda())
       _, preds = pred:max(2)
+      print(preds)
+      print(correct)
       correct = correct + preds:eq(labels:cuda()):sum()
       all = all + preds:size(1)
    end
@@ -64,10 +66,10 @@ for epoch=1,30 do
    print('accuracy % : ', correct / all * 100)
    print('')
    
-   if use_stn then
-      w1=image.display({image=spanet.output, nrow=16, legend='STN-transformed inputs, epoch : '..epoch, win=w1})
-      w2=image.display({image=tranet:get(1).output, nrow=16, legend='Inputs, epoch : '..epoch, win=w2})
-   end
+   --if use_stn then
+   --   w1=image.display({image=spanet.output, nrow=16, legend='STN-transformed inputs, epoch : '..epoch, win=w1})
+   --   w2=image.display({image=tranet:get(1).output, nrow=16, legend='Inputs, epoch : '..epoch, win=w2})
+   --end
    
 end
 

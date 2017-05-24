@@ -56,7 +56,8 @@ for epoch=1,30 do
       local inputs, labels = datasetVal:getBatch(batchidx)
       local pred = model:forward(inputs:cuda())
       valError = valError + criterion:forward(pred, labels:cuda())
-      _, preds = pred:max(2):cuda()
+      _, preds = pred:max(2)
+      preds:cuda()
       correct = correct + preds:eq(labels:cuda()):sum()
       all = all + preds:size(1)
    end

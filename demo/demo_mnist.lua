@@ -29,7 +29,7 @@ if use_stn then
    model:insert(spanet,1)
 end
 
-model:cuda()
+--model:cuda()
 criterion = nn.ClassNLLCriterion():cuda()
 
 optimState = {learningRate = 0.01, momentum = 0.9, weightDecay = 5e-4}

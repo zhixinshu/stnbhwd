@@ -17,9 +17,9 @@ datasetTrain, datasetVal = createDatasetsDistorted()
 model = nn.Sequential()
 model:add(nn.View(32*32))
 model:add(nn.Linear(32*32, 128))
-model:add(cudnn.ReLU(true))
+model:add(nn.ReLU(true))
 model:add(nn.Linear(128, 128))
-model:add(cudnn.ReLU(true))
+model:add(nn.ReLU(true))
 model:add(nn.Linear(128, 10))
 model:add(nn.LogSoftMax())
 
@@ -30,7 +30,8 @@ if use_stn then
 end
 
 --model:cuda()
-criterion = nn.ClassNLLCriterion():cuda()
+--criterion = nn.ClassNLLCriterion():cuda()
+criterion = nn.ClassNLLCriterion()
 
 optimState = {learningRate = 0.01, momentum = 0.9, weightDecay = 5e-4}
 optimizer = nn.Optim(model, optimState)
@@ -42,7 +43,8 @@ for epoch=1,30 do
    local trainError = 0
    for batchidx = 1, datasetTrain:getNumBatches() do
       local inputs, labels = datasetTrain:getBatch(batchidx)
-      err = optimizer:optimize(optim.sgd, inputs:cuda(), labels:cuda(), criterion)
+      --err = optimizer:optimize(optim.sgd, inputs:cuda(), labels:cuda(), criterion)
+      err = optimizer:optimize(optim.sgd, inputs, labels, criterion)
       --print('epoch : ', epoch, 'batch : ', batchidx, 'train error : ', err)
       trainError = trainError + err
    end
@@ -54,12 +56,15 @@ for epoch=1,30 do
    local all = 0
    for batchidx = 1, datasetVal:getNumBatches() do
       local inputs, labels = datasetVal:getBatch(batchidx)
-      local pred = model:forward(inputs:cuda())
-      valError = valError + criterion:forward(pred, labels:cuda())
+      --local pred = model:forward(inputs:cuda())
+      --valError = valError + criterion:forward(pred, labels:cuda())
+      local pred = model:forward(inputs)
+      valError = valError + criterion:forward(pred, labels)
       _, preds = pred:max(2)
       print(pred)
       print(correct)
-      correct = correct + preds:eq(labels:cuda()):sum()
+      --correct = correct + preds:eq(labels:cuda()):sum()
+      correct = correct + preds:eq(labels):sum()
       all = all + preds:size(1)
    end
    print('validation error : ', valError / datasetVal:getNumBatches())
